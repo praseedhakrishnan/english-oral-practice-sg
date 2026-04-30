@@ -2,9 +2,22 @@ import { useState, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext.jsx'
 import AudioRecorder from '../components/AudioRecorder.jsx'
-import StimulusIllustration from '../components/StimulusIllustration.jsx'
+import PerQuestionFeedback from '../components/PerQuestionFeedback.jsx'
 import stimuli from '../data/stimuli.js'
-import { getSBCFeedback } from '../services/openaiService.js'
+import { getSBCFeedback, getSingleQuestionFeedback } from '../services/openaiService.js'
+
+const ILLUSTRATION_EMOJI = {
+  social_media: '📱',
+  healthy_living: '🏃',
+  environment: '🌿',
+  community: '🤝',
+  technology: '💻',
+  family: '👨‍👩‍👧‍👦',
+  school: '🏫',
+  food_waste: '🍽️',
+  mental_health: '💚',
+  multicultural: '🇸🇬',
+}
 
 function StimulusConversation() {
   const { state, dispatch } = useApp()
@@ -14,6 +27,12 @@ function StimulusConversation() {
   const [currentTranscript, setCurrentTranscript] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
+  // 'recording' | 'feedback' | 'summary'
+  const [questionState, setQuestionState] = useState('recording')
+  const [perQuestionFeedbacks, setPerQuestionFeedbacks] = useState([])
+  const [currentFeedback, setCurrentFeedback] = useState(null)
+  const [imgLoaded, setImgLoaded] = useState(false)
+  const [imgError, setImgError] = useState(false)
 
   const levelStimuli = stimuli.filter((s) => s.level === state.level)
   const allStimuli = levelStimuli.length > 0 ? levelStimuli : stimuli
@@ -29,40 +48,31 @@ function StimulusConversation() {
     setCurrentTranscript(t)
   }, [])
 
-  const handleNext = () => {
-    const updatedAnswers = [...answers]
-    updatedAnswers[currentQ] = currentTranscript
-    setAnswers(updatedAnswers)
-    setCurrentTranscript('')
-    setCurrentQ((q) => q + 1)
-    setError(null)
-  }
-
-  const handleFinish = async () => {
-    if (!currentTranscript.trim() && !answers[currentQ]) {
+  const handleSubmitAnswer = async () => {
+    const answer = currentTranscript.trim() || answers[currentQ] || ''
+    if (!answer) {
       setError('Please record your answer first!')
       return
     }
 
-    const finalAnswers = [...answers]
-    finalAnswers[currentQ] = currentTranscript
+    const updatedAnswers = [...answers]
+    updatedAnswers[currentQ] = answer
+    setAnswers(updatedAnswers)
 
     setIsLoading(true)
     setError(null)
 
     try {
-      const feedback = await getSBCFeedback(stimulus.questions, finalAnswers, state.level)
-      dispatch({
-        type: 'SET_FEEDBACK',
-        payload: {
-          type: 'sbc',
-          feedback,
-          stimulus,
-          questions: stimulus.questions,
-          answers: finalAnswers,
-        },
-      })
-      navigate('/feedback')
+      const feedback = await getSingleQuestionFeedback(
+        stimulus.questions[currentQ],
+        answer,
+        state.level
+      )
+      const updatedFeedbacks = [...perQuestionFeedbacks]
+      updatedFeedbacks[currentQ] = feedback
+      setPerQuestionFeedbacks(updatedFeedbacks)
+      setCurrentFeedback(feedback)
+      setQuestionState('feedback')
     } catch (err) {
       setError('Failed to get feedback. Please try again.')
       console.error(err)
@@ -71,6 +81,55 @@ function StimulusConversation() {
     }
   }
 
+  const handleNextAfterFeedback = async () => {
+    if (isLastQuestion) {
+      // All questions done — generate overall summary and navigate
+      const finalAnswers = [...answers]
+      setIsLoading(true)
+      setError(null)
+      try {
+        const feedback = await getSBCFeedback(stimulus.questions, finalAnswers, state.level)
+        dispatch({
+          type: 'SET_FEEDBACK',
+          payload: {
+            type: 'sbc',
+            feedback,
+            stimulus,
+            questions: stimulus.questions,
+            answers: finalAnswers,
+            perQuestionFeedbacks: [...perQuestionFeedbacks],
+          },
+        })
+        navigate('/feedback')
+      } catch (err) {
+        setError('Failed to get summary feedback. Please try again.')
+        console.error(err)
+      } finally {
+        setIsLoading(false)
+      }
+    } else {
+      setCurrentQ((q) => q + 1)
+      setCurrentTranscript('')
+      setCurrentFeedback(null)
+      setQuestionState('recording')
+      setError(null)
+    }
+  }
+
+  // ── Per-question feedback view ──────────────────────────────────────────────
+  if (questionState === 'feedback' && currentFeedback) {
+    return (
+      <PerQuestionFeedback
+        question={stimulus.questions[currentQ]}
+        transcript={answers[currentQ]}
+        feedback={currentFeedback}
+        onNext={isLoading ? undefined : handleNextAfterFeedback}
+        isLast={isLastQuestion}
+      />
+    )
+  }
+
+  // ── Recording / question view ───────────────────────────────────────────────
   return (
     <div className="space-y-5">
       <div className="flex items-center gap-3">
@@ -88,9 +147,27 @@ function StimulusConversation() {
         </div>
         <h2 className="text-xl font-bold text-gray-800 mb-3">{stimulus.title}</h2>
 
-        {/* SVG Illustration */}
-        <div className="mb-4">
-          <StimulusIllustration type={stimulus.illustrationType} />
+        {/* Pexels Image */}
+        <div className="mb-4 relative">
+          {!imgLoaded && !imgError && (
+            <div className="w-full max-h-72 h-48 bg-gray-200 rounded-2xl animate-pulse" />
+          )}
+          {!imgError && stimulus.imageUrl && (
+            <img
+              src={stimulus.imageUrl}
+              alt={`Visual stimulus: ${stimulus.title}`}
+              crossOrigin="anonymous"
+              className={`rounded-2xl object-cover max-h-72 w-full shadow-md transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0 absolute inset-0'}`}
+              onLoad={() => setImgLoaded(true)}
+              onError={() => { setImgError(true); setImgLoaded(false) }}
+            />
+          )}
+          {imgError && (
+            <div className="w-full h-40 rounded-2xl bg-primary-50 border border-primary-100 flex flex-col items-center justify-center gap-2">
+              <span className="text-5xl">{ILLUSTRATION_EMOJI[stimulus.illustrationType] || '🖼️'}</span>
+              <p className="text-primary-500 font-semibold text-sm text-center">{stimulus.title}</p>
+            </div>
+          )}
         </div>
 
         {/* Image description */}
@@ -125,21 +202,9 @@ function StimulusConversation() {
         <p className="text-gray-800 font-medium text-lg">{stimulus.questions[currentQ]}</p>
       </div>
 
-      {/* Previous answers */}
-      {answers.length > 0 && (
-        <div className="space-y-2">
-          {answers.map((ans, i) => ans && (
-            <div key={i} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-              <p className="text-xs text-gray-400 font-medium mb-1">Q{i + 1}: {stimulus.questions[i]}</p>
-              <p className="text-sm text-gray-600">{ans}</p>
-            </div>
-          ))}
-        </div>
-      )}
-
       {/* Tips */}
       <div className="bg-mint-50 border border-mint-100 rounded-xl p-3">
-        <p className="text-mint-400 text-sm">💡 Tip: Give a complete answer! Share your opinion and support it with reasons or examples.</p>
+        <p className="text-mint-400 text-sm">💡 Tip: Use the SEES strategy — <strong>S</strong>tate your point, <strong>E</strong>laborate, give an <strong>E</strong>xample, then <strong>S</strong>tate again!</p>
       </div>
 
       {/* Recorder */}
@@ -154,36 +219,27 @@ function StimulusConversation() {
         <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-red-700 text-sm">{error}</div>
       )}
 
-      {/* Navigation */}
-      {!isLastQuestion ? (
-        <button
-          onClick={handleNext}
-          disabled={!currentTranscript.trim()}
-          className="w-full py-4 bg-primary-400 text-white rounded-xl font-bold text-lg hover:bg-primary-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md active:scale-95"
-        >
-          Next Question →
-        </button>
-      ) : (
-        <button
-          onClick={handleFinish}
-          disabled={isLoading || (!currentTranscript.trim() && !answers[currentQ])}
-          className="w-full py-4 bg-coral-300 text-white rounded-xl font-bold text-lg hover:bg-coral-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md active:scale-95"
-        >
-          {isLoading ? (
-            <span className="flex items-center justify-center gap-2">
-              <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-              </svg>
-              Analysing your answers...
-            </span>
-          ) : (
-            '🤖 Finish & Get Feedback'
-          )}
-        </button>
-      )}
+      {/* Submit button */}
+      <button
+        onClick={handleSubmitAnswer}
+        disabled={isLoading || (!currentTranscript.trim() && !answers[currentQ])}
+        className="w-full py-4 bg-coral-300 text-white rounded-xl font-bold text-lg hover:bg-coral-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md active:scale-95"
+      >
+        {isLoading ? (
+          <span className="flex items-center justify-center gap-2">
+            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+            </svg>
+            Getting feedback...
+          </span>
+        ) : (
+          '🤖 Submit Answer'
+        )}
+      </button>
     </div>
   )
 }
 
 export default StimulusConversation
+
