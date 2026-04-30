@@ -13,7 +13,7 @@ function Navbar() {
   const location = useLocation()
 
   return (
-    <nav className="bg-red-600 text-white shadow-lg">
+    <nav className="bg-gradient-to-r from-primary-400 to-primary-500 text-white shadow-md">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2 font-bold text-lg">
@@ -30,8 +30,8 @@ function Navbar() {
                 to={link.to}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   location.pathname === link.to
-                    ? 'bg-white text-red-600'
-                    : 'hover:bg-red-500'
+                    ? 'bg-white text-primary-500'
+                    : 'hover:bg-white/20'
                 }`}
               >
                 {link.label}
@@ -41,7 +41,7 @@ function Navbar() {
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-red-500 transition-colors"
+            className="md:hidden p-2 rounded-lg hover:bg-white/20 transition-colors"
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >
@@ -59,7 +59,7 @@ function Navbar() {
                 key={link.to}
                 to={link.to}
                 className={`block px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  location.pathname === link.to ? 'bg-white text-red-600' : 'hover:bg-red-500'
+                  location.pathname === link.to ? 'bg-white text-primary-500' : 'hover:bg-white/20'
                 }`}
                 onClick={() => setIsOpen(false)}
               >

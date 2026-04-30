@@ -69,19 +69,19 @@ function ReadingAloud() {
 
       {/* Level badge */}
       <div className="flex gap-2">
-        <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-semibold">{passage.level}</span>
+        <span className="bg-primary-100 text-primary-500 px-3 py-1 rounded-full text-sm font-semibold">{passage.level}</span>
         <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm">{passage.topic}</span>
       </div>
 
       {/* Passage */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-md">
         <h2 className="text-xl font-bold text-gray-800 mb-4">{passage.title}</h2>
         <p className="text-gray-700 leading-relaxed text-base">{passage.text}</p>
       </div>
 
       {/* Tips */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-        <p className="text-blue-700 text-sm font-medium">💡 Tips: Read at a comfortable pace. Pause at punctuation marks. Use expression to bring the text to life!</p>
+      <div className="bg-mint-50 border border-mint-100 rounded-xl p-4">
+        <p className="text-mint-400 text-sm font-medium">💡 Tips: Read at a comfortable pace. Pause at punctuation marks. Use expression to bring the text to life!</p>
       </div>
 
       {/* Recorder */}
@@ -99,7 +99,7 @@ function ReadingAloud() {
       <button
         onClick={handleGetFeedback}
         disabled={isLoading || !transcript.trim()}
-        className="w-full py-4 bg-red-600 text-white rounded-xl font-bold text-lg hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md active:scale-95"
+        className="w-full py-4 bg-primary-400 text-white rounded-xl font-bold text-lg hover:bg-primary-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md active:scale-95"
       >
         {isLoading ? (
           <span className="flex items-center justify-center gap-2">

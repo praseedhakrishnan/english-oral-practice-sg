@@ -13,11 +13,15 @@ function StimulusConversation() {
   const [currentTranscript, setCurrentTranscript] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const [imageError, setImageError] = useState(false)
 
   const levelStimuli = stimuli.filter((s) => s.level === state.level)
   const allStimuli = levelStimuli.length > 0 ? levelStimuli : stimuli
 
   const stimulus = useMemo(() => {
+    setImageLoaded(false)
+    setImageError(false)
     return allStimuli[Math.floor(Math.random() * allStimuli.length)]
   }, [state.level])
 
@@ -81,15 +85,40 @@ function StimulusConversation() {
       </div>
 
       {/* Stimulus card */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+      <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-md">
         <div className="flex items-start gap-3 mb-3">
-          <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-semibold">{stimulus.level}</span>
+          <span className="bg-primary-100 text-primary-500 px-3 py-1 rounded-full text-sm font-semibold">{stimulus.level}</span>
         </div>
-        <h2 className="text-xl font-bold text-gray-800 mb-2">{stimulus.title}</h2>
+        <h2 className="text-xl font-bold text-gray-800 mb-3">{stimulus.title}</h2>
 
-        {/* Image description box */}
-        <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-4 mb-3">
-          <p className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-1">Visual Stimulus</p>
+        {/* Real image with loading/error states */}
+        {stimulus.imageUrl && (
+          <div className="mb-4">
+            {!imageLoaded && !imageError && (
+              <div className="w-full bg-gray-200 rounded-xl animate-pulse flex items-center justify-center" style={{ aspectRatio: '16/9', maxHeight: '350px' }}>
+                <span className="text-gray-400 text-4xl">🖼️</span>
+              </div>
+            )}
+            {imageError && (
+              <div className="w-full bg-primary-50 rounded-xl flex flex-col items-center justify-center gap-2" style={{ aspectRatio: '16/9', maxHeight: '350px' }}>
+                <span className="text-6xl">🎭</span>
+                <p className="text-primary-400 text-sm font-medium">Visual Stimulus</p>
+              </div>
+            )}
+            <img
+              src={stimulus.imageUrl}
+              alt={stimulus.imageDescription}
+              className={`w-full rounded-xl object-cover shadow-md transition-opacity duration-300 ${imageLoaded ? 'block opacity-100' : 'hidden opacity-0'}`}
+              style={{ maxHeight: '350px' }}
+              onLoad={() => setImageLoaded(true)}
+              onError={() => { setImageError(true); setImageLoaded(false) }}
+            />
+          </div>
+        )}
+
+        {/* Image description */}
+        <div className="bg-primary-50 border border-primary-100 rounded-xl p-4 mb-3">
+          <p className="text-xs text-primary-400 uppercase tracking-wide font-medium mb-1">Visual Stimulus Description</p>
           <p className="text-gray-600 text-sm">{stimulus.imageDescription}</p>
         </div>
 
@@ -106,7 +135,7 @@ function StimulusConversation() {
             <div
               key={i}
               className={`h-2 w-8 rounded-full transition-colors ${
-                i < currentQ ? 'bg-green-400' : i === currentQ ? 'bg-red-500' : 'bg-gray-200'
+                i < currentQ ? 'bg-mint-300' : i === currentQ ? 'bg-primary-400' : 'bg-gray-200'
               }`}
             />
           ))}
@@ -114,8 +143,8 @@ function StimulusConversation() {
       </div>
 
       {/* Current question */}
-      <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-        <p className="text-xs text-red-500 font-semibold uppercase tracking-wide mb-1">Examiner's Question</p>
+      <div className="bg-primary-50 border border-primary-100 rounded-xl p-4">
+        <p className="text-xs text-primary-400 font-semibold uppercase tracking-wide mb-1">Examiner's Question</p>
         <p className="text-gray-800 font-medium text-lg">{stimulus.questions[currentQ]}</p>
       </div>
 
@@ -132,8 +161,8 @@ function StimulusConversation() {
       )}
 
       {/* Tips */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
-        <p className="text-blue-700 text-sm">💡 Tip: Give a complete answer! Share your opinion and support it with reasons or examples.</p>
+      <div className="bg-mint-50 border border-mint-100 rounded-xl p-3">
+        <p className="text-mint-400 text-sm">💡 Tip: Give a complete answer! Share your opinion and support it with reasons or examples.</p>
       </div>
 
       {/* Recorder */}
@@ -153,7 +182,7 @@ function StimulusConversation() {
         <button
           onClick={handleNext}
           disabled={!currentTranscript.trim()}
-          className="w-full py-4 bg-red-600 text-white rounded-xl font-bold text-lg hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md active:scale-95"
+          className="w-full py-4 bg-primary-400 text-white rounded-xl font-bold text-lg hover:bg-primary-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md active:scale-95"
         >
           Next Question →
         </button>
@@ -161,7 +190,7 @@ function StimulusConversation() {
         <button
           onClick={handleFinish}
           disabled={isLoading || (!currentTranscript.trim() && !answers[currentQ])}
-          className="w-full py-4 bg-red-600 text-white rounded-xl font-bold text-lg hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md active:scale-95"
+          className="w-full py-4 bg-coral-300 text-white rounded-xl font-bold text-lg hover:bg-coral-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md active:scale-95"
         >
           {isLoading ? (
             <span className="flex items-center justify-center gap-2">

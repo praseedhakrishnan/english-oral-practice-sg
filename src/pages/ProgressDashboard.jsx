@@ -23,7 +23,7 @@ function MiniChart({ sessions }) {
     <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-20">
       <polyline
         fill="none"
-        stroke="#dc2626"
+        stroke="#4A90D9"
         strokeWidth="2"
         points={points.join(' ')}
       />
@@ -31,7 +31,7 @@ function MiniChart({ sessions }) {
         const x = padding + (i / (scores.length - 1)) * (width - padding * 2)
         const y = height - padding - ((score - minScore) / (maxScore - minScore)) * (height - padding * 2)
         return (
-          <circle key={i} cx={x} cy={y} r="4" fill="#dc2626" />
+          <circle key={i} cx={x} cy={y} r="4" fill="#4A90D9" />
         )
       })}
     </svg>
@@ -68,10 +68,10 @@ function ProgressDashboard() {
           <h2 className="text-xl font-bold text-gray-700 mb-2">No sessions yet!</h2>
           <p className="text-gray-500 mb-5">Complete a practice session to see your progress here.</p>
           <div className="flex gap-3 justify-center">
-            <Link to="/reading" className="px-5 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-all">
+            <Link to="/reading" className="px-5 py-3 bg-primary-400 text-white rounded-xl font-semibold hover:bg-primary-500 transition-all">
               📖 Try Reading
             </Link>
-            <Link to="/sbc" className="px-5 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-all">
+            <Link to="/sbc" className="px-5 py-3 bg-mint-300 text-white rounded-xl font-semibold hover:bg-mint-400 transition-all">
               🎤 Try SBC
             </Link>
           </div>
@@ -96,7 +96,7 @@ function ProgressDashboard() {
           </button>
         ) : (
           <div className="flex gap-2">
-            <button onClick={handleClear} className="text-sm bg-red-600 text-white px-3 py-1 rounded-lg">
+            <button onClick={handleClear} className="text-sm bg-red-500 text-white px-3 py-1 rounded-lg">
               Confirm
             </button>
             <button onClick={() => setConfirmClear(false)} className="text-sm bg-gray-100 text-gray-600 px-3 py-1 rounded-lg">
@@ -108,8 +108,8 @@ function ProgressDashboard() {
 
       {/* Stats summary */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="bg-white rounded-xl p-4 text-center border border-gray-200 shadow-sm">
-          <div className="text-2xl font-bold text-red-600">{sessions.length}</div>
+        <div className="bg-white rounded-xl p-4 text-center border border-gray-100 shadow-sm">
+          <div className="text-2xl font-bold text-primary-400">{sessions.length}</div>
           <div className="text-xs text-gray-500 mt-1">Total Sessions</div>
         </div>
         <div className="bg-white rounded-xl p-4 text-center border border-gray-200 shadow-sm">
