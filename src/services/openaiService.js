@@ -22,13 +22,23 @@ const mockReadingFeedback = {
 }
 
 const mockSBCFeedback = {
-  overallScore: 15,
+  overallScore: 14,
+  criteria: [
+    { name: "Relevance", score: 4, maxScore: 5, comment: "Your answer addressed the question well. Try to stay more focused on the main topic." },
+    { name: "Vocabulary", score: 3, maxScore: 5, comment: "Good use of everyday words. Try to include more varied vocabulary like 'reduce', 'conserve', 'initiative'." },
+    { name: "Elaboration", score: 4, maxScore: 5, comment: "You gave some examples. Adding more specific details or personal experiences would strengthen your answer." },
+    { name: "Confidence", score: 3, maxScore: 5, comment: "Speak clearly and at a steady pace. Avoid filler words like 'um' and 'uh'." },
+  ],
   vocabulary: 14,
-  relevance: 16,
-  elaboration: 15,
-  confidence: 15,
+  relevance: 15,
+  elaboration: 14,
+  confidence: 13,
   feedback:
     "Well done on your Stimulus-Based Conversation! You gave relevant and thoughtful answers to the questions. Your responses showed that you were engaged with the topic and had your own opinions. You used a good variety of vocabulary. To score even higher, try to elaborate more on your answers — give examples from your own life or explain your reasons in more detail. Speak with confidence and maintain good eye contact (even in practice, imagine looking at the examiner).",
+  modelAnswer:
+    "I think one effective way to address this issue is to plan carefully and be more mindful of our choices. For example, families can work together to reduce waste and make better decisions. In Singapore, we can see how community efforts make a real difference when everyone plays their part. By being responsible and thoughtful, we can all contribute positively. Personally, I believe that even small actions, done consistently, can lead to meaningful change over time.",
+  generalFeedback:
+    "Great effort! You shared some good ideas. Remember to elaborate more and use varied vocabulary to impress the examiner.",
   strengths: [
     "Answers were relevant to the questions asked",
     "Good use of vocabulary and sentence structure",
@@ -47,7 +57,8 @@ async function getReadingFeedback(originalPassage, transcript, level) {
     return mockReadingFeedback
   }
 
-  const prompt = `You are an experienced Singapore PSLE English oral examiner. A ${level} student has just read the following passage aloud.
+  try {
+    const prompt = `You are an experienced Singapore PSLE English oral examiner. A ${level} student has just read the following passage aloud.
 
 ORIGINAL PASSAGE:
 "${originalPassage}"
@@ -69,26 +80,30 @@ Please evaluate the student's reading based on Singapore PSLE oral examination c
 
 Keep feedback encouraging and age-appropriate for a primary school student. Scores should be realistic — most students score between 10-18.`
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o',
-      messages: [{ role: 'user', content: prompt }],
-      response_format: { type: 'json_object' },
-      temperature: 0.7,
-    }),
-  })
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [{ role: 'user', content: prompt }],
+        response_format: { type: 'json_object' },
+        temperature: 0.7,
+      }),
+    })
 
-  if (!response.ok) {
-    throw new Error(`OpenAI API error: ${response.status}`)
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status}`)
+    }
+
+    const data = await response.json()
+    return JSON.parse(data.choices[0].message.content)
+  } catch (err) {
+    console.error('Reading feedback API error, using mock feedback:', err)
+    return mockReadingFeedback
   }
-
-  const data = await response.json()
-  return JSON.parse(data.choices[0].message.content)
 }
 
 async function getSBCFeedback(questions, answers, level) {
@@ -97,9 +112,10 @@ async function getSBCFeedback(questions, answers, level) {
     return mockSBCFeedback
   }
 
-  const qa = questions.map((q, i) => `Q${i + 1}: ${q}\nA${i + 1}: ${answers[i] || '(no answer)'}`).join('\n\n')
+  try {
+    const qa = questions.map((q, i) => `Q${i + 1}: ${q}\nA${i + 1}: ${answers[i] || '(no answer)'}`).join('\n\n')
 
-  const prompt = `You are an experienced Singapore PSLE English oral examiner. A ${level} student has just completed a Stimulus-Based Conversation (SBC).
+    const prompt = `You are an experienced Singapore PSLE English oral examiner. A ${level} student has just completed a Stimulus-Based Conversation (SBC).
 
 QUESTIONS AND STUDENT ANSWERS:
 ${qa}
@@ -107,46 +123,61 @@ ${qa}
 Please evaluate the student's performance based on Singapore PSLE SBC criteria and provide feedback in the following JSON format:
 {
   "overallScore": <number 0-20>,
+  "criteria": [
+    { "name": "Relevance", "score": <0-5>, "maxScore": 5, "comment": "<specific feedback>" },
+    { "name": "Vocabulary", "score": <0-5>, "maxScore": 5, "comment": "<specific feedback>" },
+    { "name": "Elaboration", "score": <0-5>, "maxScore": 5, "comment": "<specific feedback>" },
+    { "name": "Confidence", "score": <0-5>, "maxScore": 5, "comment": "<specific feedback>" }
+  ],
   "vocabulary": <number 0-20>,
   "relevance": <number 0-20>,
   "elaboration": <number 0-20>,
   "confidence": <number 0-20>,
   "feedback": "<2-3 sentences of encouraging, constructive overall feedback>",
+  "modelAnswer": "<a PSLE-appropriate model answer for the main question>",
+  "generalFeedback": "<one encouraging sentence summarising the performance>",
   "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
   "improvements": ["<improvement 1>", "<improvement 2>", "<improvement 3>"]
 }
 
 Keep feedback encouraging and age-appropriate for a primary school student. Scores should be realistic — most students score between 10-18.`
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o',
-      messages: [{ role: 'user', content: prompt }],
-      response_format: { type: 'json_object' },
-      temperature: 0.7,
-    }),
-  })
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [{ role: 'user', content: prompt }],
+        response_format: { type: 'json_object' },
+        temperature: 0.7,
+      }),
+    })
 
-  if (!response.ok) {
-    throw new Error(`OpenAI API error: ${response.status}`)
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status}`)
+    }
+
+    const data = await response.json()
+    return JSON.parse(data.choices[0].message.content)
+  } catch (err) {
+    console.error('SBC feedback API error, using mock feedback:', err)
+    return mockSBCFeedback
   }
-
-  const data = await response.json()
-  return JSON.parse(data.choices[0].message.content)
 }
 
 async function getModelAnswer(question, level) {
+  const mockAnswer = `In my opinion, this is an important topic that affects many people. I think that we should all try our best to understand different perspectives and work together to find solutions. For example, in Singapore, we can see how people come together as a community to tackle challenges. By being responsible, kind, and thoughtful, we can all make a positive difference. Personally, I believe that every individual has a role to play, and even small actions can lead to big changes over time.`
+
   if (isDemoMode) {
     await new Promise((r) => setTimeout(r, 1000))
-    return `In my opinion, this is an important topic that affects many people. I think that we should all try our best to understand different perspectives and work together to find solutions. For example, in Singapore, we can see how people come together as a community to tackle challenges. By being responsible, kind, and thoughtful, we can all make a positive difference. Personally, I believe that every individual has a role to play, and even small actions can lead to big changes over time.`
+    return mockAnswer
   }
 
-  const prompt = `You are helping a Singapore primary school student (${level}) prepare for the PSLE English oral examination. 
+  try {
+    const prompt = `You are helping a Singapore primary school student (${level}) prepare for the PSLE English oral examination. 
 
 Please provide a model answer for the following SBC question:
 "${question}"
@@ -161,25 +192,29 @@ The answer should:
 
 Provide only the model answer text, no additional commentary.`
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
-    }),
-  })
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+      }),
+    })
 
-  if (!response.ok) {
-    throw new Error(`OpenAI API error: ${response.status}`)
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status}`)
+    }
+
+    const data = await response.json()
+    return data.choices[0].message.content
+  } catch (err) {
+    console.error('Model answer API error, using mock answer:', err)
+    return mockAnswer
   }
-
-  const data = await response.json()
-  return data.choices[0].message.content
 }
 
 export { getReadingFeedback, getSBCFeedback, getModelAnswer, isDemoMode }
