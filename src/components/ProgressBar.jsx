@@ -1,4 +1,4 @@
-function ProgressBar({ value = 0, color = 'bg-red-500', label = '', showPercent = true }) {
+function ProgressBar({ value = 0, color = 'bg-primary-300', label = '', showPercent = true }) {
   const pct = Math.min(100, Math.max(0, (value / 20) * 100))
 
   return (

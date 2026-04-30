@@ -102,7 +102,7 @@ function FeedbackScreen() {
       <div className="grid grid-cols-2 gap-3">
         <Link
           to={type === 'reading' ? '/reading' : '/sbc'}
-          className="py-3 bg-red-600 text-white rounded-xl font-semibold text-center hover:bg-red-700 transition-all"
+          className="py-3 bg-primary-400 text-white rounded-xl font-semibold text-center hover:bg-primary-500 transition-all"
         >
           🔄 Try Again
         </Link>
@@ -116,7 +116,7 @@ function FeedbackScreen() {
 
       <Link
         to="/progress"
-        className="block text-center text-red-600 text-sm font-medium hover:underline"
+        className="block text-center text-primary-400 text-sm font-medium hover:underline"
       >
         📊 View all my progress →
       </Link>
