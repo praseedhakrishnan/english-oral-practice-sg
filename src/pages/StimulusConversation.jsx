@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext.jsx'
 import AudioRecorder from '../components/AudioRecorder.jsx'
+import StimulusIllustration from '../components/StimulusIllustration.jsx'
 import stimuli from '../data/stimuli.js'
 import { getSBCFeedback } from '../services/openaiService.js'
 
@@ -13,15 +14,11 @@ function StimulusConversation() {
   const [currentTranscript, setCurrentTranscript] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
-  const [imageLoaded, setImageLoaded] = useState(false)
-  const [imageError, setImageError] = useState(false)
 
   const levelStimuli = stimuli.filter((s) => s.level === state.level)
   const allStimuli = levelStimuli.length > 0 ? levelStimuli : stimuli
 
   const stimulus = useMemo(() => {
-    setImageLoaded(false)
-    setImageError(false)
     return allStimuli[Math.floor(Math.random() * allStimuli.length)]
   }, [state.level])
 
@@ -91,30 +88,10 @@ function StimulusConversation() {
         </div>
         <h2 className="text-xl font-bold text-gray-800 mb-3">{stimulus.title}</h2>
 
-        {/* Real image with loading/error states */}
-        {stimulus.imageUrl && (
-          <div className="mb-4">
-            {!imageLoaded && !imageError && (
-              <div className="w-full bg-gray-200 rounded-xl animate-pulse flex items-center justify-center" style={{ aspectRatio: '16/9', maxHeight: '350px' }}>
-                <span className="text-gray-400 text-4xl">🖼️</span>
-              </div>
-            )}
-            {imageError && (
-              <div className="w-full bg-primary-50 rounded-xl flex flex-col items-center justify-center gap-2" style={{ aspectRatio: '16/9', maxHeight: '350px' }}>
-                <span className="text-6xl">🎭</span>
-                <p className="text-primary-400 text-sm font-medium">Visual Stimulus</p>
-              </div>
-            )}
-            <img
-              src={stimulus.imageUrl}
-              alt={stimulus.imageDescription}
-              className={`w-full rounded-xl object-cover shadow-md transition-opacity duration-300 ${imageLoaded ? 'block opacity-100' : 'hidden opacity-0'}`}
-              style={{ maxHeight: '350px' }}
-              onLoad={() => setImageLoaded(true)}
-              onError={() => { setImageError(true); setImageLoaded(false) }}
-            />
-          </div>
-        )}
+        {/* SVG Illustration */}
+        <div className="mb-4">
+          <StimulusIllustration type={stimulus.illustrationType} />
+        </div>
 
         {/* Image description */}
         <div className="bg-primary-50 border border-primary-100 rounded-xl p-4 mb-3">

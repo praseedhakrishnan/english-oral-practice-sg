@@ -13,26 +13,72 @@ function Home() {
     <div className="space-y-6">
       {/* Demo mode banner */}
       {isDemoMode && (
-        <div className="bg-yellow-50 border border-yellow-300 rounded-2xl p-4 flex items-start gap-3">
-          <span className="text-2xl">⚠️</span>
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3">
+          <span className="text-2xl">ℹ️</span>
           <div>
-            <p className="font-semibold text-yellow-800">Demo Mode</p>
-            <p className="text-yellow-700 text-sm">No API key detected. The app will use sample feedback. Add your OpenAI API key in a <code className="bg-yellow-100 px-1 rounded">.env</code> file to enable real AI feedback.</p>
+            <p className="font-semibold text-blue-800">Practice Mode</p>
+            <p className="text-blue-700 text-sm">Running in Practice Mode. AI feedback is simulated. Add an OpenAI API key to enable live AI feedback.</p>
           </div>
         </div>
       )}
 
       {/* Hero banner */}
       <div className="relative overflow-hidden rounded-2xl shadow-md">
-        <img
-          src="https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=1200&q=80"
-          alt=""
-          aria-hidden="true"
-          loading="eager"
-          decoding="async"
-          className="w-full h-52 object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-primary-600/80 via-primary-500/40 to-transparent" />
+        <svg viewBox="0 0 800 208" xmlns="http://www.w3.org/2000/svg" className="w-full" style={{ display: 'block' }}>
+          {/* Sky gradient */}
+          <defs>
+            <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#1565c0" />
+              <stop offset="100%" stopColor="#42a5f5" />
+            </linearGradient>
+            <linearGradient id="overlayGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="transparent" />
+              <stop offset="100%" stopColor="#1565c0" stopOpacity="0.7" />
+            </linearGradient>
+          </defs>
+          <rect width="800" height="208" fill="url(#skyGrad)" />
+          {/* Clouds */}
+          <ellipse cx="120" cy="45" rx="55" ry="22" fill="#fff" fillOpacity="0.25" />
+          <ellipse cx="155" cy="38" rx="38" ry="18" fill="#fff" fillOpacity="0.2" />
+          <ellipse cx="85" cy="40" rx="30" ry="15" fill="#fff" fillOpacity="0.2" />
+          <ellipse cx="650" cy="35" rx="60" ry="24" fill="#fff" fillOpacity="0.2" />
+          <ellipse cx="690" cy="28" rx="40" ry="18" fill="#fff" fillOpacity="0.18" />
+          <ellipse cx="615" cy="32" rx="32" ry="15" fill="#fff" fillOpacity="0.18" />
+          {/* Water */}
+          <rect x="0" y="148" width="800" height="60" fill="#1976d2" fillOpacity="0.5" />
+          <path d="M0 155 Q100 145 200 155 Q300 165 400 155 Q500 145 600 155 Q700 165 800 155 L800 208 L0 208 Z" fill="#1976d2" fillOpacity="0.35" />
+          {/* MBS silhouette */}
+          <rect x="260" y="80" width="20" height="80" fill="#0d47a1" fillOpacity="0.85" />
+          <rect x="283" y="80" width="20" height="80" fill="#0d47a1" fillOpacity="0.85" />
+          <rect x="306" y="80" width="20" height="80" fill="#0d47a1" fillOpacity="0.85" />
+          <rect x="258" y="74" width="70" height="10" rx="3" fill="#1565c0" fillOpacity="0.9" />
+          <ellipse cx="293" cy="68" rx="40" ry="9" fill="#1976d2" fillOpacity="0.9" />
+          {/* City buildings */}
+          <rect x="50" y="105" width="30" height="55" fill="#0d47a1" fillOpacity="0.7" />
+          <rect x="84" y="92" width="25" height="68" fill="#1565c0" fillOpacity="0.75" />
+          <rect x="112" y="112" width="22" height="48" fill="#0d47a1" fillOpacity="0.7" />
+          <rect x="137" y="98" width="28" height="62" fill="#1565c0" fillOpacity="0.72" />
+          <rect x="168" y="108" width="20" height="52" fill="#0d47a1" fillOpacity="0.7" />
+          <rect x="192" y="88" width="35" height="72" fill="#1565c0" fillOpacity="0.7" />
+          <rect x="230" y="100" width="25" height="60" fill="#0d47a1" fillOpacity="0.7" />
+          <rect x="340" y="95" width="28" height="65" fill="#1565c0" fillOpacity="0.72" />
+          <rect x="372" y="105" width="22" height="55" fill="#0d47a1" fillOpacity="0.7" />
+          <rect x="397" y="88" width="32" height="72" fill="#1565c0" fillOpacity="0.75" />
+          <rect x="432" y="98" width="25" height="62" fill="#0d47a1" fillOpacity="0.7" />
+          <rect x="460" y="108" width="28" height="52" fill="#1565c0" fillOpacity="0.72" />
+          <rect x="492" y="92" width="22" height="68" fill="#0d47a1" fillOpacity="0.7" />
+          <rect x="517" y="100" width="30" height="60" fill="#1565c0" fillOpacity="0.72" />
+          <rect x="550" y="88" width="25" height="72" fill="#0d47a1" fillOpacity="0.75" />
+          <rect x="578" y="105" width="30" height="55" fill="#1565c0" fillOpacity="0.7" />
+          <rect x="612" y="95" width="22" height="65" fill="#0d47a1" fillOpacity="0.7" />
+          <rect x="637" y="108" width="28" height="52" fill="#1565c0" fillOpacity="0.72" />
+          <rect x="668" y="98" width="24" height="62" fill="#0d47a1" fillOpacity="0.7" />
+          <rect x="695" y="88" width="30" height="72" fill="#1565c0" fillOpacity="0.75" />
+          <rect x="728" y="102" width="26" height="58" fill="#0d47a1" fillOpacity="0.7" />
+          <rect x="757" y="92" width="28" height="68" fill="#1565c0" fillOpacity="0.72" />
+          {/* Gradient overlay */}
+          <rect width="800" height="208" fill="url(#overlayGrad)" />
+        </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6">
           <div className="text-5xl mb-3 drop-shadow">🇸🇬</div>
           <h1 className="text-3xl font-bold mb-2 text-center drop-shadow">English Oral Practice SG</h1>

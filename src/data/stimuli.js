@@ -5,7 +5,7 @@ const stimuli = [
     level: "P5",
     description: "The picture shows teenagers using smartphones and social media platforms.",
     imageDescription: "A group of teenagers sitting together at a table, but each one is looking at their phone screen instead of talking to each other. Speech bubbles show social media icons like hearts, likes, and comments.",
-    imageUrl: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&q=80",
+    illustrationType: "social_media",
     questions: [
       "What do you see in the picture?",
       "Do you think spending too much time on social media is harmful for young people? Why?",
@@ -19,7 +19,7 @@ const stimuli = [
     level: "P4",
     description: "The picture shows students making healthy food choices and exercising.",
     imageDescription: "A school canteen scene where students are choosing between healthy foods like salads, fruits, and water versus unhealthy options. Some students are seen exercising in the background.",
-    imageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80",
+    illustrationType: "healthy_living",
     questions: [
       "What is happening in the picture?",
       "Why is it important for students to eat healthily and exercise regularly?",
@@ -33,7 +33,7 @@ const stimuli = [
     level: "P4",
     description: "The picture shows people of different ages taking part in environmental activities.",
     imageDescription: "A beach clean-up event with families and school children collecting rubbish. Some people are planting trees nearby, and there are banners promoting recycling and environmental care.",
-    imageUrl: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80",
+    illustrationType: "environment",
     questions: [
       "Describe what you see in the picture.",
       "Why is it important to take care of our environment?",
@@ -47,7 +47,7 @@ const stimuli = [
     level: "P5",
     description: "The picture shows volunteers helping people in the community.",
     imageDescription: "A community centre scene with young volunteers assisting elderly residents with their groceries, reading to them, and helping children with their homework. There are smiling faces all around.",
-    imageUrl: "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&q=80",
+    illustrationType: "community",
     questions: [
       "What are the people in the picture doing?",
       "Why do you think volunteering and helping others is important?",
@@ -61,7 +61,7 @@ const stimuli = [
     level: "P5",
     description: "The picture shows students using technology for learning in school.",
     imageDescription: "A modern classroom with students using tablets and laptops for learning. A teacher is using an interactive whiteboard. Some students are collaborating on a project using a shared screen.",
-    imageUrl: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&q=80",
+    illustrationType: "technology",
     questions: [
       "What do you notice in this classroom?",
       "What are the benefits of using technology for learning?",
@@ -75,7 +75,7 @@ const stimuli = [
     level: "P4",
     description: "The picture shows a multi-generational family spending quality time together.",
     imageDescription: "A Singaporean family with grandparents, parents, and children gathered around a dining table for a meal. They are laughing, sharing food, and enjoying each other's company. Traditional dishes are visible on the table.",
-    imageUrl: "https://images.unsplash.com/photo-1511895426328-dc8714191011?w=800&q=80",
+    illustrationType: "family",
     questions: [
       "Describe what is happening in the picture.",
       "Why is it important to spend quality time with your family?",
@@ -89,7 +89,7 @@ const stimuli = [
     level: "P4",
     description: "The picture shows students working together and building friendships in school.",
     imageDescription: "A school setting where students of different races and backgrounds are working together on a group project. They are sharing ideas, helping each other, and looking happy and engaged.",
-    imageUrl: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80",
+    illustrationType: "school",
     questions: [
       "What can you see in the picture?",
       "Why is it important to have good friends in school?",
@@ -103,7 +103,7 @@ const stimuli = [
     level: "P6",
     description: "The picture shows the issue of food waste and efforts to reduce it.",
     imageDescription: "A split image showing one side with overflowing food waste bins and uneaten food being thrown away, and the other side showing people sharing food, composting, and donating surplus food to those in need.",
-    imageUrl: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&q=80",
+    illustrationType: "food_waste",
     questions: [
       "What issue is being highlighted in the picture?",
       "Why do you think food waste is a serious problem in Singapore?",
@@ -117,7 +117,7 @@ const stimuli = [
     level: "P6",
     description: "The picture shows the importance of mental health and seeking support.",
     imageDescription: "A comforting scene showing friends supporting each other — one friend listening attentively to another who looks stressed, with thought bubbles showing worries about exams and pressure. In the background, a counsellor's room is visible.",
-    imageUrl: "https://images.unsplash.com/photo-1526676037777-05a232554f77?w=800&q=80",
+    illustrationType: "mental_health",
     questions: [
       "What do you see in the picture?",
       "Why do you think mental health is just as important as physical health?",
@@ -131,7 +131,7 @@ const stimuli = [
     level: "P6",
     description: "The picture shows Singapore's diverse and harmonious multicultural society.",
     imageDescription: "A vibrant street scene in Singapore showing people of different races — Chinese, Malay, Indian, and others — celebrating a festival together. Decorations from different cultures are visible, and people are sharing food and gifts with each other.",
-    imageUrl: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&q=80",
+    illustrationType: "multicultural",
     questions: [
       "Describe what you see in the picture.",
       "What makes Singapore's multicultural society special and unique?",

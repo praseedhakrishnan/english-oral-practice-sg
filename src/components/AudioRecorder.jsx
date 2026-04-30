@@ -4,7 +4,7 @@ import { useSpeechRecognition } from '../hooks/useSpeechRecognition.js'
 function AudioRecorder({ onTranscriptChange, onRecordingComplete }) {
   const [duration, setDuration] = useState(0)
   const timerRef = useRef(null)
-  const { transcript, isListening, startListening, stopListening, resetTranscript, isSupported, error } =
+  const { transcript, interimTranscript, isListening, startListening, stopListening, resetTranscript, isSupported, error } =
     useSpeechRecognition()
 
   useEffect(() => {
@@ -94,10 +94,13 @@ function AudioRecorder({ onTranscriptChange, onRecordingComplete }) {
         )}
 
         {/* Transcript preview */}
-        {transcript && (
+        {(transcript || interimTranscript) && (
           <div className="w-full mt-2 p-3 bg-gray-50 rounded-xl border border-gray-200">
             <p className="text-xs text-gray-500 font-medium mb-1 uppercase tracking-wide">Your speech:</p>
             <p className="text-sm text-gray-700 leading-relaxed">{transcript}</p>
+            {interimTranscript && (
+              <p className="text-sm text-gray-400 leading-relaxed italic">{interimTranscript}</p>
+            )}
           </div>
         )}
       </div>
