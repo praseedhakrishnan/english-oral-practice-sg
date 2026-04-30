@@ -26,7 +26,10 @@ function Home() {
       <div className="relative overflow-hidden rounded-2xl shadow-md">
         <img
           src="https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=1200&q=80"
-          alt="Singapore skyline"
+          alt=""
+          aria-hidden="true"
+          loading="eager"
+          decoding="async"
           className="w-full h-52 object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-primary-600/80 via-primary-500/40 to-transparent" />

@@ -95,12 +95,12 @@ function StimulusConversation() {
         {stimulus.imageUrl && (
           <div className="mb-4">
             {!imageLoaded && !imageError && (
-              <div className="w-full bg-gray-200 rounded-xl animate-pulse flex items-center justify-center" style={{ height: '220px' }}>
+              <div className="w-full bg-gray-200 rounded-xl animate-pulse flex items-center justify-center" style={{ aspectRatio: '16/9', maxHeight: '350px' }}>
                 <span className="text-gray-400 text-4xl">🖼️</span>
               </div>
             )}
             {imageError && (
-              <div className="w-full bg-primary-50 rounded-xl flex flex-col items-center justify-center gap-2" style={{ height: '220px' }}>
+              <div className="w-full bg-primary-50 rounded-xl flex flex-col items-center justify-center gap-2" style={{ aspectRatio: '16/9', maxHeight: '350px' }}>
                 <span className="text-6xl">🎭</span>
                 <p className="text-primary-400 text-sm font-medium">Visual Stimulus</p>
               </div>
