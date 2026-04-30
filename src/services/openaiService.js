@@ -217,4 +217,97 @@ Provide only the model answer text, no additional commentary.`
   }
 }
 
-export { getReadingFeedback, getSBCFeedback, getModelAnswer, isDemoMode }
+const mockSingleQuestionFeedbacks = [
+  {
+    scores: { relevance: 4, vocabulary: 3, elaboration: 4, confidence: 4 },
+    tip: "Great job! Try to add a specific personal example from your own life to make your answer even more convincing.",
+    modelAnswer: {
+      state: "I strongly believe that this is an important issue that affects many people in Singapore.",
+      elaborate: "This matters because it impacts our daily lives and the well-being of our community. When we pay attention to this, we can make better decisions and help those around us.",
+      example: "For example, in my own family, we try our best to make responsible choices every day. Last week, my mother reminded us to be more mindful, and it really made a difference.",
+      stateAgain: "Therefore, I think it is essential for everyone, especially young people like us, to take this seriously and play our part.",
+    },
+  },
+  {
+    scores: { relevance: 3, vocabulary: 4, elaboration: 3, confidence: 3 },
+    tip: "You used good vocabulary! Next time, try to elaborate a little more by explaining the reasons behind your opinion.",
+    modelAnswer: {
+      state: "In my opinion, this topic is very relevant to us as students in Singapore.",
+      elaborate: "I think it is important to consider different perspectives and understand how our actions affect others. By thinking carefully, we can become more responsible individuals.",
+      example: "Personally, I experienced this when I was in school. My teacher encouraged us to think about the impact of our choices, and I learnt a valuable lesson about responsibility.",
+      stateAgain: "In conclusion, I believe that being aware and thoughtful about this issue will help us grow into better people.",
+    },
+  },
+  {
+    scores: { relevance: 4, vocabulary: 4, elaboration: 4, confidence: 3 },
+    tip: "Excellent ideas! Try to speak with a little more confidence — take a deep breath before you start and project your voice clearly.",
+    modelAnswer: {
+      state: "I feel that this is a significant topic that deserves our attention and action.",
+      elaborate: "There are many reasons why this matters. It affects not only us but also the people around us, and addressing it can lead to a much better outcome for everyone involved.",
+      example: "A good example is what I observed in my neighbourhood recently. People coming together to address a common problem showed me how powerful collective effort can be.",
+      stateAgain: "So, I strongly feel that we should all take steps, no matter how small, to make a positive difference in this area.",
+    },
+  },
+]
+
+async function getSingleQuestionFeedback(question, answer, level) {
+  if (isDemoMode) {
+    await new Promise((r) => setTimeout(r, 1200))
+    const idx = Math.abs(question.length + (answer ? answer.length : 0)) % mockSingleQuestionFeedbacks.length
+    return mockSingleQuestionFeedbacks[idx]
+  }
+
+  try {
+    const prompt = `You are an experienced PSLE English oral examiner in Singapore.
+A Primary ${level} student answered the following oral exam question:
+
+Question: "${question}"
+Student's answer: "${answer || '(no answer provided)'}"
+
+Please evaluate their answer and provide feedback in this exact JSON format:
+{
+  "scores": {
+    "relevance": <1-5>,
+    "vocabulary": <1-5>,
+    "elaboration": <1-5>,
+    "confidence": <1-5>
+  },
+  "tip": "<one specific, encouraging improvement tip for a primary school student>",
+  "modelAnswer": {
+    "state": "<1 sentence stating the main point clearly>",
+    "elaborate": "<2-3 sentences explaining the point in detail>",
+    "example": "<2-3 sentences giving a specific personal or Singapore-context example>",
+    "stateAgain": "<1 sentence restating the main point in different words>"
+  }
+}
+
+Be encouraging, age-appropriate, and specific. Base scores on PSLE oral rubric.`
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [{ role: 'user', content: prompt }],
+        response_format: { type: 'json_object' },
+        temperature: 0.7,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status}`)
+    }
+
+    const data = await response.json()
+    return JSON.parse(data.choices[0].message.content)
+  } catch (err) {
+    console.error('Single question feedback API error, using mock feedback:', err)
+    const idx = Math.abs(question.length) % mockSingleQuestionFeedbacks.length
+    return mockSingleQuestionFeedbacks[idx]
+  }
+}
+
+export { getReadingFeedback, getSBCFeedback, getModelAnswer, getSingleQuestionFeedback, isDemoMode }

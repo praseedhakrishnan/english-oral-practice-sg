@@ -177,6 +177,14 @@ function Home() {
           ))}
         </ul>
       </div>
+      {/* Pexels attribution */}
+      <p className="text-center text-xs text-gray-400 pb-2">
+        Photos provided by{' '}
+        <a href="https://www.pexels.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-500">
+          Pexels
+        </a>{' '}
+        (pexels.com) — free to use under the Pexels License
+      </p>
     </div>
   )
 }
